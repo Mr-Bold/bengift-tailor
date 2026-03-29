@@ -1,0 +1,1324 @@
+.reports {
+  position: relative;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+/* Menu Overlay */
+.reports-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.reports-menu {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  overflow: hidden;
+}
+
+.menu-header {
+  background: linear-gradient(to bottom, #f5f5f5, #e8e8e8);
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 2px solid #ccc;
+  position: relative;
+}
+
+.menu-logo {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-icon {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.menu-header h2 {
+  color: #333;
+  font-size: 1.3rem;
+  margin: 0;
+  flex: 1;
+}
+
+.btn-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.btn-close:hover {
+  color: #333;
+}
+
+.menu-items {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.menu-item {
+  padding: 1rem 1.5rem;
+  background: #f8f8f8;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.menu-item:hover {
+  background: #e8e8e8;
+  border-color: #999;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.menu-back {
+  background: #e0e0e0;
+  margin-top: 0.5rem;
+}
+
+.menu-divider {
+  height: 1px;
+  background: #ccc;
+  margin: 0.5rem 0;
+}
+
+.menu-navigate {
+  background: linear-gradient(to bottom, #c8e6c9, #a5d6a7);
+  border-color: #66bb6a;
+  color: #1b5e20;
+  font-weight: 600;
+}
+
+.menu-navigate:hover {
+  background: linear-gradient(to bottom, #a5d6a7, #c8e6c9);
+  border-color: #43a047;
+}
+
+/* Report Content */
+.report-content {
+  padding: 0;
+  background: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* Reports Overlay - Same Page */
+.reports-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  z-index: 2000;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.reports-close-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2001;
+  background: white;
+  border: 2px solid #999;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: #333;
+}
+
+.reports-close-btn:hover {
+  background: #f0f0f0;
+  border-color: #666;
+  transform: scale(1.1);
+}
+
+.reports-overlay .report-content {
+  padding: 0;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #d4a574;
+}
+
+.report-header h2 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.btn-back,
+.btn-menu {
+  padding: 0.6rem 1.5rem;
+  background: #e8e8e8;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-back:hover,
+.btn-menu:hover {
+  background: #d8d8d8;
+  border-color: #999;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  margin-top: 1rem;
+}
+
+.report-table thead {
+  background: #f0f0f0;
+}
+
+.report-table th {
+  padding: 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.report-table td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+}
+
+.report-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.credit {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.pending {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.due-amount {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.urgent {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem !important;
+  color: #999;
+  font-style: italic;
+}
+
+.day-summary {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.summary-item {
+  flex: 1;
+  padding: 1rem;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.summary-item strong {
+  color: #555;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.info-message {
+  padding: 2rem;
+  background: #e3f2fd;
+  border-radius: 8px;
+  text-align: center;
+  color: #1976d2;
+}
+
+.info-message p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+/* Stats Grid (for Ratings view) */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  border-color: #d4a574;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c5aa0;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.report-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  margin-top: 2rem;
+}
+
+.report-section h2 {
+  font-size: 1.25rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.status-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.status-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.status-name {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.status-count {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c5aa0;
+  margin-bottom: 0.25rem;
+}
+
+.status-percentage {
+  font-size: 0.9rem;
+  color: #ff9800;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .reports-menu {
+    width: 95%;
+    max-width: none;
+  }
+
+  .menu-items {
+    padding: 1rem;
+  }
+
+  .day-summary {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-content {
+    padding: 1rem;
+  }
+
+  .report-table {
+    font-size: 0.85rem;
+  }
+
+  .report-table th,
+  .report-table td {
+    padding: 0.5rem;
+  }
+}
+
+/* Account Book Styles */
+.account-book-title-bar {
+  background: linear-gradient(to bottom, #6b5d4f, #4a3f33);
+  color: #f0d9a0;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.account-book-filters {
+  background: #6b5d4f;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #4a3f33;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.filter-group input[type="date"],
+.filter-group select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #999;
+  border-radius: 3px;
+  background: white;
+  font-size: 0.85rem;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 200px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #999;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}
+
+.action-buttons-right {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.btn-action-yellow {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(to bottom, #f9e79f, #f4d03f);
+  border: 1px solid #d4a017;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.btn-action-yellow:hover {
+  background: linear-gradient(to bottom, #f4d03f, #f9e79f);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-action-white {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(to bottom, #fff, #f0f0f0);
+  border: 1px solid #999;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.btn-action-white:hover {
+  background: linear-gradient(to bottom, #f0f0f0, #fff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.account-book-table-container {
+  overflow-x: auto;
+  background: white;
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.account-book-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.account-book-table thead {
+  background: #f0f0f0;
+}
+
+.account-book-table th {
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.account-book-table td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  font-size: 0.85rem;
+}
+
+.account-book-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.amount-debit {
+  text-align: right;
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+.amount-credit {
+  text-align: right;
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.account-book-table tfoot {
+  background: #f0f0f0;
+}
+
+.account-book-table tfoot .total-row td {
+  border-top: 2px solid #999;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.report-back-button {
+  padding: 1.5rem;
+  text-align: center;
+  background: white;
+  border-top: 1px solid #ddd;
+}
+
+/* Day Book Styles */
+.day-book-title-bar {
+  background: linear-gradient(to bottom, #6b5d4f, #4a3f33);
+  color: #f0d9a0;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.day-book-filters {
+  background: #6b5d4f;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #4a3f33;
+}
+
+.btn-view {
+  padding: 0.5rem 2rem;
+  background: linear-gradient(to bottom, #f9e79f, #f4d03f);
+  border: 1px solid #d4a017;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.btn-view:hover {
+  background: linear-gradient(to bottom, #f4d03f, #f9e79f);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.day-book-table-container {
+  overflow-x: auto;
+  background: white;
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.day-book-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.day-book-table thead {
+  background: #f0f0f0;
+}
+
+.day-book-table th {
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.day-book-table td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  font-size: 0.85rem;
+}
+
+.day-book-table tbody tr:hover:not(.total-vouchers-row) {
+  background: #f9f9f9;
+}
+
+.amount-cell {
+  text-align: right;
+  font-weight: 500;
+}
+
+.total-vouchers-row {
+  background: white;
+}
+
+.total-vouchers-text {
+  color: #d32f2f;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 1rem 0.8rem !important;
+  text-align: left;
+  border-top: 2px solid #999 !important;
+}
+/* Wages Register Styles */
+.wages-register-title-bar {
+  background: linear-gradient(to bottom, #d4a017, #b8860b);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.wages-register-filters {
+  background: #d4a017;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #b8860b;
+}
+
+.view-options {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.view-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.view-options input[type="radio"] {
+  width: 16px;
+  height: 16px;
+}
+
+.wages-register-table-container {
+  overflow-x: auto;
+  background: white;
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.wages-register-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.wages-register-table thead {
+  background: #f0f0f0;
+}
+
+.wages-register-table th {
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.wages-register-table td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  font-size: 0.85rem;
+}
+
+.wages-register-table tbody tr:hover:not(.total-row) {
+  background: #f9f9f9;
+}
+
+.wages-amount {
+  text-align: right;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.balance-amount {
+  text-align: right;
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+.complete-yes {
+  color: #4caf50;
+  font-weight: 600;
+  text-align: center;
+}
+
+.complete-no {
+  color: #ff9800;
+  font-weight: 600;
+  text-align: center;
+}
+
+.status-paid {
+  color: #4caf50;
+  font-weight: 600;
+  text-align: center;
+}
+
+.status-unpaid {
+  color: #d32f2f;
+  font-weight: 600;
+  text-align: center;
+}
+
+.wages-register-table tfoot {
+  background: #f0f0f0;
+}
+
+.wages-register-table tfoot .total-row td {
+  border-top: 2px solid #999;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+}
+
+/* Dues Register Styles */
+.dues-register-title-bar {
+  background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+  color: #333;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: -2rem -2rem 0 -2rem;
+  border-bottom: 2px solid #999;
+}
+
+.dues-register-table-container {
+  overflow-x: auto;
+  background: white;
+  padding: 1rem;
+  margin: 0 -2rem;
+}
+
+.dues-register-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.dues-register-table thead {
+  background: #f0f0f0;
+}
+
+.dues-register-table th {
+  padding: 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.dues-register-table td {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.dues-register-table tbody tr:hover:not(.total-row) {
+  background: #f9f9f9;
+}
+
+.due-amount-cell {
+  text-align: right;
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.dues-register-table tfoot {
+  background: #f0f0f0;
+}
+
+.dues-register-table tfoot .total-row td {
+  border-top: 2px solid #999;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+}
+
+/* Trial Reminder Styles */
+.trial-reminder-title-bar {
+  background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+  color: #333;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #999;
+}
+
+.trial-reminder-filters {
+  background: #d4a574;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #b8860b;
+}
+
+.btn-show {
+  padding: 0.5rem 1.5rem;
+  background: #f0f0f0;
+  border: 1px solid #999;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-show:hover {
+  background: #e0e0e0;
+}
+
+.trial-reminder-table-container {
+  overflow-x: auto;
+  background: white;
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.trial-reminder-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.trial-reminder-table thead {
+  background: #f0f0f0;
+}
+
+.trial-reminder-table th {
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.trial-reminder-table td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  font-size: 0.85rem;
+}
+
+.trial-reminder-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.trial-reminder-table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.trial-reminder-bottom {
+  background: white;
+  padding: 1.5rem;
+  display: flex;
+  gap: 2rem;
+  border-top: 1px solid #ddd;
+}
+
+.sms-template {
+  flex: 1;
+}
+
+.sms-template label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.sms-template textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+.btn-save-message {
+  padding: 0.5rem 1.5rem;
+  background: #f0f0f0;
+  border: 1px solid #999;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-save-message:hover {
+  background: #e0e0e0;
+}
+
+.trial-reminder-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.btn-send-sms {
+  padding: 0.6rem 1.5rem;
+  background: #4caf50;
+  color: white;
+  border: 1px solid #4caf50;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-send-sms:hover {
+  background: #45a049;
+  border-color: #45a049;
+}
+
+/* Birthday Reminder Styles */
+.birthday-reminder-title-bar {
+  background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+  color: #333;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #999;
+}
+
+.birthday-reminder-filters {
+  background: #6b5d4f;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #4a3f33;
+}
+
+.birthday-reminder-filters label {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.birthday-reminder-filters input[type="date"] {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #999;
+  border-radius: 3px;
+  background: white;
+  font-size: 0.9rem;
+}
+
+.birthday-reminder-table-container {
+  overflow-x: auto;
+  background: white;
+  padding: 1rem;
+  flex: 1;
+  min-height: 300px;
+  overflow-y: auto;
+}
+
+.birthday-reminder-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.birthday-reminder-table thead {
+  background: #f0f0f0;
+}
+
+.birthday-reminder-table th {
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.birthday-reminder-table td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ddd;
+  font-size: 0.85rem;
+}
+
+.birthday-reminder-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.birthday-reminder-table input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.birthday-reminder-bottom {
+  background: white;
+  padding: 1.5rem;
+  display: flex;
+  gap: 2rem;
+  border-top: 1px solid #ddd;
+}
+
+.birthday-reminder-bottom .sms-template {
+  flex: 1;
+}
+
+.birthday-reminder-bottom .sms-template label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.birthday-reminder-bottom .sms-template textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+  resize: vertical;
+}
+
+.birthday-reminder-bottom .btn-save-message {
+  padding: 0.5rem 1.5rem;
+  background: #f0f0f0;
+  border: 1px solid #999;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+}
+
+.birthday-reminder-bottom .btn-save-message:hover {
+  background: #e0e0e0;
+}
+
+.birthday-reminder-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.birthday-reminder-actions .btn-send-sms {
+  padding: 0.6rem 1.5rem;
+  background: #4caf50;
+  color: white;
+  border: 1px solid #4caf50;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.birthday-reminder-actions .btn-send-sms:hover {
+  background: #45a049;
+  border-color: #45a049;
+}
+
+/* Ratings Styles */
+.ratings-title-bar {
+  background: linear-gradient(to bottom, #e8e8e8, #d0d0d0);
+  color: #333;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #999;
+}
+
+.ratings-table-container {
+  overflow-x: auto;
+  background: white;
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.ratings-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+.ratings-table thead {
+  background: #f0f0f0;
+}
+
+.ratings-table th {
+  padding: 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ccc;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.ratings-table td {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.ratings-table tbody tr:hover {
+  background: #f9f9f9;
+}
+
+.rank-cell {
+  text-align: center;
+  font-weight: 600;
+  color: #2c5aa0;
+}
+
+.scorer-cell {
+  text-align: center;
+  font-weight: 500;
+}
+
+.rating-cell {
+  font-size: 1.2rem;
+  letter-spacing: 0.2rem;
+}
+
+.ratings-stats {
+  padding: 1.5rem 0;
+}
+
+.ratings-stats .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.ratings-stats .stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s;
+}
+
+.ratings-stats .stat-card:hover {
+  border-color: #d4a574;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ratings-stats .stat-icon {
+  font-size: 2.5rem;
+}
+
+.ratings-stats .stat-content {
+  flex: 1;
+}
+
+.ratings-stats .stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2c5aa0;
+  margin-bottom: 0.25rem;
+}
+
+.ratings-stats .stat-label {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.ratings-stats .report-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+.ratings-stats .report-section h2 {
+  font-size: 1.25rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.ratings-stats .status-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.ratings-stats .status-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.ratings-stats .status-name {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.ratings-stats .status-count {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c5aa0;
+  margin-bottom: 0.25rem;
+}
+
+.ratings-stats .status-percentage {
+  font-size: 0.9rem;
+  color: #ff9800;
+  font-weight: 600;
+}
