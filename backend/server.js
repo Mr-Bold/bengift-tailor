@@ -49,7 +49,8 @@ app.get('/api/health', (req, res) => {
 // Error handler
 app.use(errorHandler)
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`)
+  console.log(`📍 Environment: ${process.env.NODE_ENV}`)
   console.log(`📍 API: http://localhost:${PORT}/api`)
 })
