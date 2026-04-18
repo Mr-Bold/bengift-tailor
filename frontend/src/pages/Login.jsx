@@ -7,19 +7,14 @@ import logo from '/images/LOGO WINE.png';
 
 function Login() {
   const navigate = useNavigate();
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    confirmPassword: '',
-    email: '',
-    fullName: '',
     rememberMe: false
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [showCaptcha, setShowCaptcha] = useState(false);
   const [captchaAnswer, setCaptchaAnswer] = useState('');
@@ -54,84 +49,6 @@ function Login() {
       [name]: type === 'checkbox' ? checked : value
     });
     setError('');
-  };
-
-  const toggleMode = () => {
-    setIsRegisterMode(!isRegisterMode);
-    setError('');
-    setShowCaptcha(false);
-    setLoginAttempts(0);
-    setFormData({
-      username: '',
-      password: '',
-      confirmPassword: '',
-      email: '',
-      fullName: '',
-      rememberMe: false
-    });
-  };
-
-  const validateRegistration = () => {
-    if (!formData.fullName.trim()) {
-      setError('Full name cannot be empty');
-      return false;
-    }
-    if (!formData.username.trim()) {
-      setError('Username cannot be empty');
-      return false;
-    }
-    if (!formData.email.trim() || !formData.email.includes('.')) {
-      setError('Please enter a valid email with a dot (.)');
-      return false;
-    }
-    if (!formData.password || formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return false;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
-    return true;
-  };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (!validateRegistration()) {
-      showToast.error(error);
-      return;
-    }
-
-    setLoading(true);
-    setLoadingStep('Creating your account...');
-
-    try {
-      const response = await authAPI.register({
-        username: formData.username.trim(),
-        password: formData.password,
-        email: formData.email.trim().toLowerCase(),
-        fullName: formData.fullName.trim(),
-        role: 'user'
-      });
-
-      if (response.success) {
-        localStorage.setItem('lastLoginTime', new Date().toISOString());
-        showToast.success('Registration successful! Welcome to BenGift Clothing.');
-        setTimeout(() => navigate('/'), 500);
-      } else {
-        const errorMsg = response.message || 'Registration failed';
-        setError(errorMsg);
-        showToast.error(errorMsg);
-      }
-    } catch (err) {
-      console.error('Registration error:', err);
-      const errorMsg = err.response?.data?.message || 'Registration failed. Please try again.';
-      setError(errorMsg);
-      showToast.error(errorMsg);
-    } finally {
-      setLoading(false);
-      setLoadingStep('');
-    }
   };
 
   const handleLogin = async (e) => {
@@ -185,11 +102,7 @@ function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isRegisterMode) {
-      handleRegister(e);
-    } else {
-      handleLogin(e);
-    }
+    handleLogin(e);
   };
 
   const handleForgotPassword = () => {
@@ -253,9 +166,6 @@ function Login() {
           <p className="welcome-text">
             Manage your tailoring business with ease. Track orders, customers, and workers all in one place.
           </p>
-          <button className="learn-more-btn" onClick={toggleMode}>
-            {isRegisterMode ? 'Already have an account?' : 'Create New Account'}
-          </button>
         </div>
         <div className="decorative-shapes">
           <div className="shape shape-1"></div>
@@ -267,7 +177,7 @@ function Login() {
       {/* Right Side - Sign In Form */}
       <div className="signin-section">
         <div className="signin-card">
-          <h2 className="signin-title">{isRegisterMode ? 'Sign Up' : 'Sign In'}</h2>
+          <h2 className="signin-title">Sign In</h2>
 
           <form className="signin-form" onSubmit={handleSubmit}>
             {error && (
@@ -277,36 +187,6 @@ function Login() {
               </div>
             )}
 
-            {isRegisterMode && (
-              <>
-                <div className="form-field">
-                  <label>Full Name</label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    placeholder="Enter your full name"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label>Email Address</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="your.email@example.com"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-              </>
-            )}
-
             <div className="form-field">
               <label>User Name</label>
               <input
@@ -314,7 +194,7 @@ function Login() {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder={isRegisterMode ? "Choose a username" : "TechTree"}
+                placeholder="TechTree"
                 required
                 disabled={loading}
               />
@@ -343,48 +223,21 @@ function Login() {
               </div>
             </div>
 
-            {isRegisterMode && (
-              <div className="form-field">
-                <label>Confirm Password</label>
-                <div className="password-wrapper">
-                  <input
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    required
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    tabIndex="-1"
-                  >
-                    {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
-                  </button>
-                </div>
-              </div>
-            )}
+            <div className="form-options">
+              <label className="remember-checkbox">
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  checked={formData.rememberMe}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+                <span>Remember me</span>
+              </label>
+              <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); handleForgotPassword(); }}>Forgot Password?</a>
+            </div>
 
-            {!isRegisterMode && (
-              <div className="form-options">
-                <label className="remember-checkbox">
-                  <input
-                    type="checkbox"
-                    name="rememberMe"
-                    checked={formData.rememberMe}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                  <span>Remember me</span>
-                </label>
-                <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); handleForgotPassword(); }}>Forgot Password?</a>
-              </div>
-            )}
-
-            {!isRegisterMode && showCaptcha && (
+            {showCaptcha && (
               <div className="captcha-field">
                 <label>Security Check: {captchaQuestion.num1} + {captchaQuestion.num2} = ?</label>
                 <div className="captcha-input-wrapper">
@@ -407,7 +260,7 @@ function Login() {
               </div>
             )}
 
-            {!isRegisterMode && loginAttempts > 0 && loginAttempts < 5 && (
+            {loginAttempts > 0 && loginAttempts < 5 && (
               <div className="attempts-alert">
                 ⚠️ {5 - loginAttempts} attempts remaining
               </div>
@@ -417,10 +270,10 @@ function Login() {
               {loading ? (
                 <>
                   <span className="btn-spinner"></span>
-                  {loadingStep || (isRegisterMode ? 'Creating Account...' : 'Signing In...')}
+                  {loadingStep || 'Signing In...'}
                 </>
               ) : (
-                isRegisterMode ? 'Create Account' : 'Submit'
+                'Submit'
               )}
             </button>
           </form>
