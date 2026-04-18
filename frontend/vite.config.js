@@ -19,16 +19,19 @@ export default defineConfig({
         theme_color: '#8b0000',
         background_color: '#ffffff',
         display: 'standalone',
+        start_url: '/',
         icons: [
           {
             src: '/images/LOGO WINE.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
           },
           {
             src: '/images/LOGO WINE.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       },
@@ -36,7 +39,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg}'],
         runtimeCaching: [
           {
-            urlPattern: /^http:\/\/localhost:5000\/api\/.*/i,
+            urlPattern: /^https:\/\/bengift-tailor-backend\.onrender\.com\/api\/.*/i,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
@@ -53,4 +56,5 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  publicDir: 'images'
 })
