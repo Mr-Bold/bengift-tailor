@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// Production backend URL - update this with your actual Render backend URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+// Production backend URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://bengift-tailor-backend.onrender.com/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
