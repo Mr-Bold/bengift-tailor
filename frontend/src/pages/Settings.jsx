@@ -293,6 +293,51 @@ function Settings({ ctx }) {
       showToast.error('Error installing app. Please try again.')
     }
   }
+          showToast.success('All data cleared from database and localStorage')
+        } catch (error) {
+          console.error('Error clearing data:', error)
+          showToast.error('Error clearing database. Cleared localStorage only.')
+          setJobs([])
+          setCustomers([])
+          setWorkers([])
+          localStorage.clear()
+        }
+      }
+    }
+  }
+
+  const handleInstallApp = async () => {
+    if (!deferredPrompt) {
+      if (isInstalled) {
+        showToast.info('App is already installed!')
+      } else {
+        showToast.info('Install prompt not available. Try adding to home screen from your browser menu.')
+      }
+      return
+    }
+
+    try {
+      // Show the install prompt
+      deferredPrompt.prompt()
+
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice
+
+      if (outcome === 'accepted') {
+        showToast.success('Installing app...')
+        // Clear the dismissed flag so prompt can show again if needed
+        localStorage.removeItem('pwa-install-dismissed')
+      } else {
+        showToast.info('Installation cancelled')
+      }
+
+      // Clear the deferredPrompt
+      setDeferredPrompt(null)
+    } catch (error) {
+      console.error('Error installing app:', error)
+      showToast.error('Error installing app. Please try again.')
+    }
+  }
 
   return (
     <div className="settings">
