@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './Settings.css'
 import { jobsAPI, customersAPI, workersAPI, fabricsAPI } from '../services/api'
 import { showToast } from '../utils/toast'
@@ -7,6 +7,34 @@ import * as XLSX from 'xlsx'
 function Settings({ ctx }) {
   const { jobs, setJobs, customers, setCustomers, workers, setWorkers } = ctx
   const [showHelp, setShowHelp] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [isInstalled, setIsInstalled] = useState(false)
+
+  useEffect(() => {
+    // Check if app is already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true)
+    }
+
+    // Listen for the beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+    }
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+
+    // Listen for app installed event
+    window.addEventListener('appinstalled', () => {
+      setIsInstalled(true)
+      setDeferredPrompt(null)
+      showToast.success('App installed successfully!')
+    })
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    }
+  }, [])
 
   const exportData = () => {
     const data = {
@@ -233,11 +261,67 @@ function Settings({ ctx }) {
     }
   }
 
+  const handleInstallApp = async () => {
+    if (!deferredPrompt) {
+      if (isInstalled) {
+        showToast.info('App is already installed!')
+      } else {
+        showToast.info('Install prompt not available. Try adding to home screen from your browser menu.')
+      }
+      return
+    }
+
+    try {
+      // Show the install prompt
+      deferredPrompt.prompt()
+
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice
+
+      if (outcome === 'accepted') {
+        showToast.success('Installing app...')
+        // Clear the dismissed flag so prompt can show again if needed
+        localStorage.removeItem('pwa-install-dismissed')
+      } else {
+        showToast.info('Installation cancelled')
+      }
+
+      // Clear the deferredPrompt
+      setDeferredPrompt(null)
+    } catch (error) {
+      console.error('Error installing app:', error)
+      showToast.error('Error installing app. Please try again.')
+    }
+  }
+
   return (
     <div className="settings">
       <div className="page-header">
         <h1>Settings</h1>
         <p>Application settings and data management</p>
+      </div>
+
+      <div className="settings-section">
+        <h2>App Settings</h2>
+        
+        <div className="setting-item">
+          <div>
+            <h3>Install App</h3>
+            <p>
+              {isInstalled 
+                ? 'App is already installed on your device' 
+                : 'Install BenGift Clothing app for offline access and faster loading'}
+            </p>
+          </div>
+          <button 
+            onClick={handleInstallApp} 
+            className="btn-primary"
+            disabled={isInstalled}
+            style={{ opacity: isInstalled ? 0.6 : 1 }}
+          >
+            {isInstalled ? '✓ Installed' : '📱 Install App'}
+          </button>
+        </div>
       </div>
 
       <div className="settings-section">
