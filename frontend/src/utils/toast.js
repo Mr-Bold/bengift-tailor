@@ -22,6 +22,30 @@ export const showToast = {
       borderRadius: '8px',
     },
   }),
+
+  info: (message) => toast(message, {
+    duration: 3000,
+    position: 'top-right',
+    icon: 'ℹ️',
+    style: {
+      background: '#3b82f6',
+      color: '#fff',
+      padding: '16px',
+      borderRadius: '8px',
+    },
+  }),
+
+  warning: (message) => toast(message, {
+    duration: 3000,
+    position: 'top-right',
+    icon: '⚠️',
+    style: {
+      background: '#f59e0b',
+      color: '#fff',
+      padding: '16px',
+      borderRadius: '8px',
+    },
+  }),
   
   loading: (message) => toast.loading(message, {
     position: 'top-right',
