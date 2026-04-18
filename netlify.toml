@@ -4,8 +4,8 @@
   # Base directory where the frontend code lives
   base = "frontend"
   
-  # Build command to install dependencies and build the app
-  command = "npm install && npm run build"
+  # Build command - install dev dependencies too
+  command = "npm install --include=dev && npm run build"
   
   # Directory where the built files are located (relative to base)
   publish = "dist"
