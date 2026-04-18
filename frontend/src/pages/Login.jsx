@@ -56,6 +56,7 @@ function Login() {
 
     if (showCaptcha && parseInt(captchaAnswer) !== captchaQuestion.answer) {
       setError('Incorrect CAPTCHA. Please try again.');
+      showToast.error('Incorrect CAPTCHA. Please try again.');
       generateCaptcha();
       return;
     }
@@ -64,7 +65,9 @@ function Login() {
     setLoadingStep('Authenticating...');
 
     try {
+      console.log('Attempting login with username:', formData.username);
       const response = await authAPI.login(formData.username, formData.password);
+      console.log('Login response:', response);
       
       if (response.success) {
         localStorage.setItem('lastLoginTime', new Date().toISOString());
@@ -77,12 +80,17 @@ function Login() {
         setTimeout(() => navigate('/'), 500);
       } else {
         handleFailedLogin();
-        setError(response.message || 'Login failed');
+        const errorMsg = response.message || 'Login failed';
+        setError(errorMsg);
+        showToast.error(errorMsg);
       }
     } catch (err) {
       console.error('Login error:', err);
+      console.error('Error response:', err.response);
       handleFailedLogin();
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+      const errorMsg = err.response?.data?.message || err.message || 'Login failed. Please check your credentials.';
+      setError(errorMsg);
+      showToast.error(errorMsg);
     } finally {
       setLoading(false);
       setLoadingStep('');
