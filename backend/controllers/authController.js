@@ -437,3 +437,85 @@ export const changePassword = async (req, res) => {
     });
   }
 };
+
+// Reset password (without authentication)
+export const resetPassword = async (req, res) => {
+  try {
+    const { username, email, newPassword } = req.body;
+
+    if (!username || !email || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username, email, and new password are required'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters long'
+      });
+    }
+
+    // Find user by username and email
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, username, email')
+      .eq('username', username)
+      .eq('email', email)
+      .single();
+
+    if (error || !user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with that username and email combination'
+      });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHash = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ password_hash: newPasswordHash })
+      .eq('id', user.id);
+
+    if (updateError) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to reset password'
+      });
+    }
+
+    // Delete all refresh tokens (force re-login on all devices)
+    await supabase
+      .from('refresh_tokens')
+      .delete()
+      .eq('user_id', user.id);
+
+    // Log audit
+    await supabase
+      .from('audit_logs')
+      .insert([{
+        user_id: user.id,
+        action: 'reset_password',
+        resource: 'user',
+        resource_id: user.id,
+        ip_address: req.ip,
+        user_agent: req.get('user-agent')
+      }]);
+
+    res.json({
+      success: true,
+      message: 'Password reset successfully. You can now login with your new password.'
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during password reset'
+    });
+  }
+};

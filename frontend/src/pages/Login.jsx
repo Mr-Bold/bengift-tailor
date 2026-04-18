@@ -26,7 +26,7 @@ function Login() {
   const [captchaQuestion, setCaptchaQuestion] = useState({ num1: 0, num2: 0, answer: 0 });
   const [loadingStep, setLoadingStep] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
+  const [resetData, setResetData] = useState({ username: '', email: '', newPassword: '', confirmPassword: '' });
 
   useEffect(() => {
     if (authAPI.isAuthenticated()) {
@@ -199,19 +199,42 @@ function Login() {
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
-    if (!resetEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
-      showToast.error('Please enter a valid email address');
+    
+    if (!resetData.username.trim()) {
+      showToast.error('Username cannot be empty');
+      return;
+    }
+    if (!resetData.email.trim() || !resetData.email.includes('.')) {
+      showToast.error('Please enter a valid email with a dot (.)');
+      return;
+    }
+    if (!resetData.newPassword || resetData.newPassword.length < 6) {
+      showToast.error('Password must be at least 6 characters long');
+      return;
+    }
+    if (resetData.newPassword !== resetData.confirmPassword) {
+      showToast.error('Passwords do not match');
       return;
     }
 
     setLoading(true);
     try {
-      // For now, just show a message. You can implement actual email sending later
-      showToast.success('Password reset instructions have been sent to your email (Feature coming soon)');
-      setShowForgotPassword(false);
-      setResetEmail('');
+      const response = await authAPI.resetPassword(
+        resetData.username,
+        resetData.email,
+        resetData.newPassword
+      );
+      
+      if (response.success) {
+        showToast.success('Password reset successfully! You can now login with your new password.');
+        setShowForgotPassword(false);
+        setResetData({ username: '', email: '', newPassword: '', confirmPassword: '' });
+      } else {
+        showToast.error(response.message || 'Password reset failed');
+      }
     } catch (err) {
-      showToast.error('Failed to send reset email. Please try again.');
+      console.error('Password reset error:', err);
+      showToast.error(err.response?.data?.message || 'Password reset failed. Please check your details.');
     } finally {
       setLoading(false);
     }
@@ -437,14 +460,47 @@ function Login() {
             </div>
             <form onSubmit={handlePasswordReset}>
               <div className="modal-body">
-                <p>Enter your email address and we'll send you instructions to reset your password.</p>
+                <p>Enter your username, email, and new password to reset your account.</p>
+                <div className="form-field">
+                  <label>Username</label>
+                  <input
+                    type="text"
+                    value={resetData.username}
+                    onChange={(e) => setResetData({...resetData, username: e.target.value})}
+                    placeholder="Your username"
+                    required
+                    disabled={loading}
+                  />
+                </div>
                 <div className="form-field">
                   <label>Email Address</label>
                   <input
                     type="email"
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
+                    value={resetData.email}
+                    onChange={(e) => setResetData({...resetData, email: e.target.value})}
                     placeholder="your.email@example.com"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <div className="form-field">
+                  <label>New Password</label>
+                  <input
+                    type="password"
+                    value={resetData.newPassword}
+                    onChange={(e) => setResetData({...resetData, newPassword: e.target.value})}
+                    placeholder="At least 6 characters"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <div className="form-field">
+                  <label>Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={resetData.confirmPassword}
+                    onChange={(e) => setResetData({...resetData, confirmPassword: e.target.value})}
+                    placeholder="Re-enter new password"
                     required
                     disabled={loading}
                   />
@@ -460,7 +516,7 @@ function Login() {
                   Cancel
                 </button>
                 <button type="submit" className="btn-primary" disabled={loading}>
-                  {loading ? 'Sending...' : 'Send Reset Link'}
+                  {loading ? 'Resetting...' : 'Reset Password'}
                 </button>
               </div>
             </form>

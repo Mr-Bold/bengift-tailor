@@ -10,6 +10,7 @@ import { body } from 'express-validator';
 router.post('/register', authLimiter, registerValidation, authController.register);
 router.post('/login', authLimiter, loginValidation, authController.login);
 router.post('/refresh', authLimiter, authController.refreshToken);
+router.post('/reset-password', authLimiter, authController.resetPassword);
 
 // Protected routes (require authentication)
 router.post('/logout', verifyToken, authController.logout);

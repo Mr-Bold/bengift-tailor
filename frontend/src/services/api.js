@@ -119,6 +119,15 @@ export const authAPI = {
     return response.data
   },
 
+  resetPassword: async (username, email, newPassword) => {
+    const response = await api.post('/auth/reset-password', { 
+      username, 
+      email, 
+      newPassword 
+    })
+    return response.data
+  },
+
   // Check if user is authenticated
   isAuthenticated: () => {
     const token = localStorage.getItem('token')
