@@ -1,12 +1,12 @@
 import express from 'express'
-import Shop from '../models/Shop.js'
+import Shop from '../models/supabase/Shop.js'
 
 const router = express.Router()
 
 // Get shop info
 router.get('/', async (req, res) => {
   try {
-    let shop = await Shop.findOne()
+    let shop = await Shop.get()
     
     // Create default shop if none exists
     if (!shop) {
@@ -28,16 +28,15 @@ router.get('/', async (req, res) => {
 // Update shop info
 router.put('/', async (req, res) => {
   try {
-    let shop = await Shop.findOne()
+    let shop = await Shop.get()
     
     if (!shop) {
-      shop = new Shop(req.body)
+      shop = await Shop.create(req.body)
     } else {
-      Object.assign(shop, req.body)
+      shop = await Shop.update(shop.id, req.body)
     }
     
-    const savedShop = await shop.save()
-    res.json(savedShop)
+    res.json(shop)
   } catch (error) {
     res.status(400).json({ message: error.message })
   }

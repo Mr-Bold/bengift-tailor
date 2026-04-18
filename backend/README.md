@@ -4,12 +4,14 @@ Complete backend API for the BenGift Clothing Tailor Management System.
 
 ## Tech Stack
 
-- **Runtime**: Node.js
+- **Runtime**: Node.js (ES6 Modules)
 - **Framework**: Express.js
-- **Database**: MongoDB
-- **SMS**: Hubtel API (Ghana)
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: JWT with bcrypt
+- **Security**: Helmet, Rate Limiting, Input Validation
+- **SMS**: Twilio API
 
-## Setup Instructions
+## Quick Start
 
 ### 1. Install Dependencies
 
@@ -18,24 +20,7 @@ cd backend
 npm install
 ```
 
-### 2. Install MongoDB
-
-**Option A: MongoDB Atlas (Cloud - Recommended)**
-1. Go to https://www.mongodb.com/cloud/atlas
-2. Create free account
-3. Create a cluster (free tier)
-4. Get connection string
-5. Add to `.env` file
-
-**Option B: Local MongoDB**
-```bash
-# Windows (using Chocolatey)
-choco install mongodb
-
-# Or download from: https://www.mongodb.com/try/download/community
-```
-
-### 3. Configure Environment
+### 2. Configure Environment
 
 Create `.env` file in backend folder:
 
@@ -43,13 +28,22 @@ Create `.env` file in backend folder:
 cp .env.example .env
 ```
 
-Edit `.env` with your settings:
+Edit `.env` with your Supabase credentials:
 ```
-MONGODB_URI=mongodb://localhost:27017/bengift_tailor
+SUPABASE_URL=https://ewnaxjfovtgnalpmqwht.supabase.co
+SUPABASE_KEY=your_supabase_anon_key
+JWT_SECRET=your_jwt_secret_key
+JWT_REFRESH_SECRET=your_refresh_secret_key
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=+1234567890
 PORT=5000
-HUBTEL_CLIENT_ID=your_client_id
-HUBTEL_CLIENT_SECRET=your_client_secret
+NODE_ENV=development
 ```
+
+### 3. Setup Database
+
+Run the SQL in `COMPLETE_SETUP.sql` in your Supabase SQL Editor to create all tables and the admin user.
 
 ### 4. Start Backend Server
 
@@ -59,15 +53,22 @@ npm run dev
 
 Server will run on: http://localhost:5000
 
-### 5. Configure Frontend
+### 5. Login Credentials
 
-Create `.env` file in root folder:
-
-```
-VITE_API_URL=http://localhost:5000/api
-```
+- **Username**: admin
+- **Password**: Admin123
 
 ## API Endpoints
+
+### Authentication (Public)
+- `POST /api/auth/login` - Login user
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/refresh` - Refresh access token
+- `POST /api/auth/logout` - Logout user
+
+### Protected Endpoints (Require JWT Token)
+
+All endpoints below require `Authorization: Bearer <token>` header.
 
 ### Jobs
 - `GET /api/jobs` - Get all jobs (with filters)
@@ -81,22 +82,18 @@ VITE_API_URL=http://localhost:5000/api
 
 ### Customers
 - `GET /api/customers` - Get all customers
-- `GET /api/customers/:id` - Get single customer
 - `POST /api/customers` - Create customer
 - `PUT /api/customers/:id` - Update customer
 - `DELETE /api/customers/:id` - Delete customer
-- `POST /api/customers/search` - Advanced search
 
 ### Workers
 - `GET /api/workers` - Get all workers
-- `GET /api/workers/:id` - Get single worker
 - `POST /api/workers` - Create worker
 - `PUT /api/workers/:id` - Update worker
 - `DELETE /api/workers/:id` - Delete worker
 
 ### Fabrics
 - `GET /api/fabrics` - Get all fabrics
-- `GET /api/fabrics/:id` - Get single fabric
 - `POST /api/fabrics` - Create fabric
 - `PUT /api/fabrics/:id` - Update fabric
 - `DELETE /api/fabrics/:id` - Delete fabric
@@ -109,58 +106,27 @@ VITE_API_URL=http://localhost:5000/api
 - `POST /api/sms/send` - Send single SMS
 - `POST /api/sms/send-bulk` - Send bulk SMS
 
+## Security Features
+
+- JWT authentication with access and refresh tokens
+- Password hashing with bcrypt (10 salt rounds)
+- Rate limiting (100 requests/15min, 5 login attempts/15min)
+- Input validation and sanitization
+- Helmet security headers
+- SQL injection prevention via parameterized queries
+- Role-based access control (admin, staff, viewer)
+
 ## Database Schema
 
-### Jobs Collection
-```javascript
-{
-  jobNo: String,
-  customerName: String,
-  customerId: ObjectId,
-  orderDate: Date,
-  deliveryDate: Date,
-  trialDate: Date,
-  workerId: ObjectId,
-  items: Array,
-  totalAmount: Number,
-  advancePaid: Number,
-  balance: Number,
-  status: String,
-  cancelled: Boolean
-}
-```
-
-### Customers Collection
-```javascript
-{
-  name: String,
-  phone: String,
-  email: String,
-  address: String,
-  city: String,
-  totalOrders: Number,
-  totalSpent: Number
-}
-```
-
-### Workers Collection
-```javascript
-{
-  name: String,
-  phone: String,
-  salary: Number,
-  status: String,
-  specialization: Array
-}
-```
-
-## Migration from localStorage
-
-To migrate existing data from localStorage to MongoDB, use the migration script:
-
-```bash
-npm run migrate
-```
+See `COMPLETE_SETUP.sql` for the complete database schema including:
+- users (authentication)
+- refresh_tokens (JWT refresh tokens)
+- audit_logs (security audit trail)
+- customers
+- jobs
+- workers
+- fabrics
+- shops
 
 ## Testing API
 
@@ -171,15 +137,28 @@ Test the API using:
 
 Example:
 ```bash
+# Health check
 curl http://localhost:5000/api/health
+
+# Login
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"Admin123"}'
 ```
 
 ## Production Deployment
 
 1. Set `NODE_ENV=production` in `.env`
-2. Use MongoDB Atlas for database
-3. Deploy to: Heroku, Railway, Render, or DigitalOcean
-4. Update frontend `VITE_API_URL` to production URL
+2. Update `SUPABASE_URL` and `SUPABASE_KEY` with production credentials
+3. Generate strong `JWT_SECRET` and `JWT_REFRESH_SECRET`
+4. Deploy to: Render, Railway, or DigitalOcean
+5. Update frontend `VITE_API_URL` to production URL
+6. Enable CORS for your production frontend domain
+
+## Documentation
+
+- `SECURITY_IMPLEMENTATION.md` - Complete security implementation guide
+- `COMPLETE_SETUP.sql` - Database setup SQL script
 
 ## Support
 

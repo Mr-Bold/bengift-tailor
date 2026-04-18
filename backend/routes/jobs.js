@@ -1,44 +1,63 @@
 import express from 'express'
-import Job from '../models/Job.js'
-import Customer from '../models/Customer.js'
+import Job from '../models/supabase/Job.js'
+import Customer from '../models/supabase/Customer.js'
+import Worker from '../models/supabase/Worker.js'
 
 const router = express.Router()
+
+// Helper function to convert snake_case to camelCase
+const toCamelCase = (job) => {
+  if (!job) return null
+  return {
+    id: job.id,
+    jobNo: job.job_no,
+    customerName: job.customer_name,
+    customerId: job.customer_id,
+    orderDate: job.order_date,
+    deliveryDate: job.delivery_date,
+    trialDate: job.trial_date,
+    workerId: job.worker_id,
+    items: job.items,
+    totalAmount: job.total_amount,
+    advancePaid: job.advance_paid,
+    balance: job.balance,
+    receiptAccount: job.receipt_account,
+    status: job.status,
+    cancelled: job.cancelled,
+    cancelReason: job.cancel_reason,
+    notes: job.notes,
+    createdAt: job.created_at,
+    updatedAt: job.updated_at
+  }
+}
 
 // Get all jobs with filters
 router.get('/', async (req, res) => {
   try {
-    const { status, workerId, fromDate, toDate, dateType, search } = req.query
+    const { status, workerId, fromDate, toDate, search } = req.query
     
-    let query = {}
+    const filters = {}
     
     if (status && status !== 'All') {
-      query.status = status
+      filters.status = status
     }
     
     if (workerId && workerId !== 'All') {
-      query.workerId = workerId
-    }
-    
-    if (fromDate && toDate) {
-      const dateField = dateType === 'deliveryDate' ? 'deliveryDate' : 'orderDate'
-      query[dateField] = {
-        $gte: new Date(fromDate),
-        $lte: new Date(toDate)
-      }
+      filters.workerId = workerId
     }
     
     if (search) {
-      query.$or = [
-        { jobNo: { $regex: search, $options: 'i' } },
-        { customerName: { $regex: search, $options: 'i' } }
-      ]
+      filters.search = search
     }
     
-    const jobs = await Job.find(query)
-      .populate('workerId', 'name')
-      .sort({ orderDate: -1 })
+    if (fromDate && toDate) {
+      filters.startDate = fromDate
+      filters.endDate = toDate
+    }
     
-    res.json(jobs)
+    const jobs = await Job.findAll(filters)
+    const camelCaseJobs = jobs.map(toCamelCase)
+    res.json(camelCaseJobs)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -48,14 +67,12 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const job = await Job.findById(req.params.id)
-      .populate('workerId', 'name phone')
-      .populate('customerId', 'name phone email')
     
     if (!job) {
       return res.status(404).json({ message: 'Job not found' })
     }
     
-    res.json(job)
+    res.json(toCamelCase(job))
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -65,43 +82,45 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     console.log('📥 POST /api/jobs - Received request')
-    console.log('📦 Request body:', JSON.stringify(req.body, null, 2))
     
-    // Clean up empty strings for ObjectId fields
-    if (req.body.workerId === '') req.body.workerId = null
-    if (req.body.customerId === '') req.body.customerId = null
+    // Convert MongoDB field names to PostgreSQL (snake_case)
+    const jobData = {
+      job_no: req.body.jobNo,
+      customer_name: req.body.customerName,
+      customer_id: req.body.customerId || null,
+      order_date: req.body.orderDate || new Date().toISOString(),
+      delivery_date: req.body.deliveryDate,
+      trial_date: req.body.trialDate || null,
+      worker_id: req.body.workerId || null,
+      items: req.body.items || [],
+      total_amount: req.body.totalAmount,
+      advance_paid: req.body.advancePaid || 0,
+      balance: req.body.balance,
+      receipt_account: req.body.receiptAccount || 'Cash',
+      status: req.body.status || 'Pending',
+      cancelled: req.body.cancelled || false,
+      cancel_reason: req.body.cancelReason || null,
+      notes: req.body.notes || null
+    }
     
-    // If workerId looks like a name (not a valid ObjectId), try to find the worker
-    if (req.body.workerId && req.body.workerId.length !== 24) {
-      console.log('⚠️  workerId appears to be a name, searching for worker...')
-      const Worker = (await import('../models/Worker.js')).default
-      const worker = await Worker.findOne({ name: req.body.workerId })
-      if (worker) {
-        console.log('✅ Found worker by name:', worker._id)
-        req.body.workerId = worker._id
-      } else {
-        console.log('❌ Worker not found, setting to null')
-        req.body.workerId = null
+    const savedJob = await Job.create(jobData)
+    console.log('✅ Job saved successfully:', savedJob.id)
+    
+    // Update customer stats
+    if (jobData.customer_id) {
+      const customer = await Customer.findById(jobData.customer_id)
+      if (customer) {
+        await Customer.updateStats(
+          jobData.customer_id,
+          (customer.total_orders || 0) + 1,
+          (customer.total_spent || 0) + parseFloat(jobData.total_amount)
+        )
       }
     }
     
-    const job = new Job(req.body)
-    console.log('🔨 Job model created, attempting to save...')
-    
-    const savedJob = await job.save()
-    console.log('✅ Job saved successfully:', savedJob._id)
-    
-    // Update customer stats
-    if (req.body.customerId) {
-      await Customer.findByIdAndUpdate(req.body.customerId, {
-        $inc: { totalOrders: 1, totalSpent: req.body.totalAmount }
-      })
-    }
-    
-    res.status(201).json(savedJob)
+    res.status(201).json(toCamelCase(savedJob))
   } catch (error) {
     console.error('❌ Error creating job:', error.message)
-    console.error('❌ Error details:', error)
     res.status(400).json({ message: error.message })
   }
 })
@@ -109,17 +128,32 @@ router.post('/', async (req, res) => {
 // Update job
 router.put('/:id', async (req, res) => {
   try {
-    const job = await Job.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    )
+    // Convert MongoDB field names to PostgreSQL
+    const jobData = {}
+    if (req.body.jobNo) jobData.job_no = req.body.jobNo
+    if (req.body.customerName) jobData.customer_name = req.body.customerName
+    if (req.body.customerId !== undefined) jobData.customer_id = req.body.customerId
+    if (req.body.orderDate) jobData.order_date = req.body.orderDate
+    if (req.body.deliveryDate) jobData.delivery_date = req.body.deliveryDate
+    if (req.body.trialDate !== undefined) jobData.trial_date = req.body.trialDate
+    if (req.body.workerId !== undefined) jobData.worker_id = req.body.workerId
+    if (req.body.items) jobData.items = req.body.items
+    if (req.body.totalAmount) jobData.total_amount = req.body.totalAmount
+    if (req.body.advancePaid !== undefined) jobData.advance_paid = req.body.advancePaid
+    if (req.body.balance !== undefined) jobData.balance = req.body.balance
+    if (req.body.receiptAccount) jobData.receipt_account = req.body.receiptAccount
+    if (req.body.status) jobData.status = req.body.status
+    if (req.body.cancelled !== undefined) jobData.cancelled = req.body.cancelled
+    if (req.body.cancelReason !== undefined) jobData.cancel_reason = req.body.cancelReason
+    if (req.body.notes !== undefined) jobData.notes = req.body.notes
+    
+    const job = await Job.update(req.params.id, jobData)
     
     if (!job) {
       return res.status(404).json({ message: 'Job not found' })
     }
     
-    res.json(job)
+    res.json(toCamelCase(job))
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
@@ -129,17 +163,13 @@ router.put('/:id', async (req, res) => {
 router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body
-    const job = await Job.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    )
+    const job = await Job.update(req.params.id, { status })
     
     if (!job) {
       return res.status(404).json({ message: 'Job not found' })
     }
     
-    res.json(job)
+    res.json(toCamelCase(job))
   } catch (error) {
     res.status(400).json({ message: error.message })
   }
@@ -148,12 +178,7 @@ router.patch('/:id/status', async (req, res) => {
 // Delete job
 router.delete('/:id', async (req, res) => {
   try {
-    const job = await Job.findByIdAndDelete(req.params.id)
-    
-    if (!job) {
-      return res.status(404).json({ message: 'Job not found' })
-    }
-    
+    await Job.delete(req.params.id)
     res.json({ message: 'Job deleted successfully' })
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -163,8 +188,10 @@ router.delete('/:id', async (req, res) => {
 // Get next job number
 router.get('/meta/next-job-number', async (req, res) => {
   try {
-    const lastJob = await Job.findOne().sort({ jobNo: -1 })
-    const nextJobNo = lastJob ? String(parseInt(lastJob.jobNo) + 1) : '1'
+    const jobs = await Job.findAll()
+    const jobNumbers = jobs.map(j => parseInt(j.job_no)).filter(n => !isNaN(n))
+    const maxJobNo = jobNumbers.length > 0 ? Math.max(...jobNumbers) : 0
+    const nextJobNo = String(maxJobNo + 1)
     res.json({ nextJobNo })
   } catch (error) {
     res.status(500).json({ message: error.message })
@@ -174,31 +201,8 @@ router.get('/meta/next-job-number', async (req, res) => {
 // Get dashboard stats
 router.get('/meta/stats', async (req, res) => {
   try {
-    const totalJobs = await Job.countDocuments()
-    const pendingJobs = await Job.countDocuments({ 
-      status: { $in: ['Pending', 'In Progress'] } 
-    })
-    const readyJobs = await Job.countDocuments({ status: 'Ready' })
-    const deliveredJobs = await Job.countDocuments({ status: 'Delivered' })
-    
-    const revenueResult = await Job.aggregate([
-      { $match: { status: 'Delivered' } },
-      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
-    ])
-    
-    const pendingAmountResult = await Job.aggregate([
-      { $match: { status: { $ne: 'Delivered' } } },
-      { $group: { _id: null, total: { $sum: '$balance' } } }
-    ])
-    
-    res.json({
-      totalJobs,
-      pendingJobs,
-      readyJobs,
-      deliveredJobs,
-      totalRevenue: revenueResult[0]?.total || 0,
-      pendingAmount: pendingAmountResult[0]?.total || 0
-    })
+    const stats = await Job.getStats()
+    res.json(stats)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }

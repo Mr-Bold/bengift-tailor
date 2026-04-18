@@ -1,0 +1,43 @@
+# Netlify Configuration for BenGift Clothing
+
+[build]
+  # Base directory where the frontend code lives
+  base = "frontend"
+  
+  # Build command to install dependencies and build the app
+  command = "npm install && npm run build"
+  
+  # Directory where the built files are located (relative to base)
+  publish = "dist"
+
+# SPA redirect rule - redirect all routes to index.html for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Environment variables (set these in Netlify UI)
+# VITE_API_URL = "https://your-backend-url.com/api"
+# VITE_SUPABASE_URL = "https://your-supabase-project.supabase.co"
+# VITE_SUPABASE_ANON_KEY = "your-supabase-anon-key"
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache images
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

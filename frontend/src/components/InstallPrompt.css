@@ -1,0 +1,220 @@
+.install-prompt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.install-prompt {
+  background: white;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.install-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 16px;
+}
+
+.install-prompt-icon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #8b0000 0%, #dc143c 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+}
+
+.install-prompt-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.install-prompt-close:hover {
+  color: #333;
+}
+
+.install-prompt-content {
+  padding: 0 24px 24px;
+}
+
+.install-prompt-content h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px;
+}
+
+.install-prompt-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.install-prompt-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.install-prompt-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.benefit-icon {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+.install-prompt-actions {
+  display: flex;
+  gap: 12px;
+  padding: 20px 24px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-continue,
+.btn-install {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-continue {
+  background: white;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-continue:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.btn-install {
+  background: linear-gradient(135deg, #8b0000 0%, #dc143c 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(139, 0, 0, 0.3);
+}
+
+.btn-install:hover {
+  box-shadow: 0 4px 12px rgba(139, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-install:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .install-prompt-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .install-prompt {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    animation: slideUpMobile 0.3s ease;
+  }
+
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .install-prompt-content h2 {
+    font-size: 20px;
+  }
+
+  .install-prompt-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-continue,
+  .btn-install {
+    width: 100%;
+  }
+}
+
+/* iOS specific styles */
+@supports (-webkit-touch-callout: none) {
+  .install-prompt {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
