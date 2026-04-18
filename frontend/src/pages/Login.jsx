@@ -73,19 +73,19 @@ function Login() {
 
   const validateRegistration = () => {
     if (!formData.fullName.trim()) {
-      setError('Full name is required');
+      setError('Full name cannot be empty');
       return false;
     }
-    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Please enter a valid email address');
+    if (!formData.username.trim()) {
+      setError('Username cannot be empty');
       return false;
     }
-    if (!formData.username.trim() || formData.username.length < 3) {
-      setError('Username must be at least 3 characters');
+    if (!formData.email.trim() || !formData.email.includes('.')) {
+      setError('Please enter a valid email with a dot (.)');
       return false;
     }
     if (!formData.password || formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Password must be at least 6 characters long');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
