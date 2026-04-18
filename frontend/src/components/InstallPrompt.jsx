@@ -16,7 +16,7 @@ function InstallPrompt() {
       e.preventDefault()
       // Stash the event so it can be triggered later
       setDeferredPrompt(e)
-      // Show the install prompt
+      // Show the install prompt automatically
       setShowPrompt(true)
     }
 
