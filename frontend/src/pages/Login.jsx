@@ -25,6 +25,8 @@ function Login() {
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   const [captchaQuestion, setCaptchaQuestion] = useState({ num1: 0, num2: 0, answer: 0 });
   const [loadingStep, setLoadingStep] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   useEffect(() => {
     if (authAPI.isAuthenticated()) {
@@ -95,17 +97,20 @@ function Login() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!validateRegistration()) return;
+    if (!validateRegistration()) {
+      showToast.error(error);
+      return;
+    }
 
     setLoading(true);
     setLoadingStep('Creating your account...');
 
     try {
       const response = await authAPI.register({
-        username: formData.username,
+        username: formData.username.trim(),
         password: formData.password,
-        email: formData.email,
-        fullName: formData.fullName,
+        email: formData.email.trim().toLowerCase(),
+        fullName: formData.fullName.trim(),
         role: 'user'
       });
 
@@ -114,11 +119,15 @@ function Login() {
         showToast.success('Registration successful! Welcome to BenGift Clothing.');
         setTimeout(() => navigate('/'), 500);
       } else {
-        setError(response.message || 'Registration failed');
+        const errorMsg = response.message || 'Registration failed';
+        setError(errorMsg);
+        showToast.error(errorMsg);
       }
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      const errorMsg = err.response?.data?.message || 'Registration failed. Please try again.';
+      setError(errorMsg);
+      showToast.error(errorMsg);
     } finally {
       setLoading(false);
       setLoadingStep('');
@@ -180,6 +189,31 @@ function Login() {
       handleRegister(e);
     } else {
       handleLogin(e);
+    }
+  };
+
+  const handleForgotPassword = () => {
+    setShowForgotPassword(true);
+    setError('');
+  };
+
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+    if (!resetEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail)) {
+      showToast.error('Please enter a valid email address');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // For now, just show a message. You can implement actual email sending later
+      showToast.success('Password reset instructions have been sent to your email (Feature coming soon)');
+      setShowForgotPassword(false);
+      setResetEmail('');
+    } catch (err) {
+      showToast.error('Failed to send reset email. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -323,7 +357,7 @@ function Login() {
                   />
                   <span>Remember me</span>
                 </label>
-                <a href="#" className="forgot-link">Forgot Password?</a>
+                <a href="#" className="forgot-link" onClick={(e) => { e.preventDefault(); handleForgotPassword(); }}>Forgot Password?</a>
               </div>
             )}
 
@@ -392,6 +426,47 @@ function Login() {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="modal-overlay" onClick={() => setShowForgotPassword(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Reset Password</h3>
+              <button className="modal-close" onClick={() => setShowForgotPassword(false)}>✕</button>
+            </div>
+            <form onSubmit={handlePasswordReset}>
+              <div className="modal-body">
+                <p>Enter your email address and we'll send you instructions to reset your password.</p>
+                <div className="form-field">
+                  <label>Email Address</label>
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="your.email@example.com"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn-secondary" 
+                  onClick={() => setShowForgotPassword(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary" disabled={loading}>
+                  {loading ? 'Sending...' : 'Send Reset Link'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
