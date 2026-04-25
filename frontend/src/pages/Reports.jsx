@@ -150,7 +150,7 @@ function Reports({ ctx, setPage }) {
         </div>
 
         <div className="report-back-button">
-          <button onClick={handleCloseReports} className="btn-back">← Back to Sidebar</button>
+          <button onClick={handleBack} className="btn-back">← Back to Menu</button>
         </div>
       </div>
     )
@@ -243,7 +243,7 @@ function Reports({ ctx, setPage }) {
         </div>
 
         <div className="report-back-button">
-          <button onClick={handleCloseReports} className="btn-back">← Back to Sidebar</button>
+          <button onClick={handleBack} className="btn-back">← Back to Menu</button>
         </div>
       </div>
     )
@@ -409,7 +409,7 @@ function Reports({ ctx, setPage }) {
         </div>
 
         <div className="report-back-button">
-          <button onClick={handleCloseReports} className="btn-back">← Back to Sidebar</button>
+          <button onClick={handleBack} className="btn-back">← Back to Menu</button>
         </div>
       </div>
     )
@@ -471,7 +471,7 @@ function Reports({ ctx, setPage }) {
         </div>
 
         <div className="report-back-button">
-          <button onClick={handleCloseReports} className="btn-back">← Back to Sidebar</button>
+          <button onClick={handleBack} className="btn-back">← Back to Menu</button>
         </div>
       </div>
     )
@@ -598,7 +598,7 @@ function Reports({ ctx, setPage }) {
         </div>
 
         <div className="report-back-button">
-          <button onClick={handleCloseReports} className="btn-back">← Back to Sidebar</button>
+          <button onClick={handleBack} className="btn-back">← Back to Menu</button>
         </div>
       </div>
     )
@@ -712,7 +712,7 @@ function Reports({ ctx, setPage }) {
         </div>
 
         <div className="report-back-button">
-          <button onClick={handleCloseReports} className="btn-back">← Back to Sidebar</button>
+          <button onClick={handleBack} className="btn-back">← Back to Menu</button>
         </div>
       </div>
     )
@@ -841,7 +841,7 @@ function Reports({ ctx, setPage }) {
         </div>
 
         <div className="report-back-button">
-          <button onClick={handleCloseReports} className="btn-back">← Back to Sidebar</button>
+          <button onClick={handleBack} className="btn-back">← Back to Menu</button>
         </div>
       </div>
     )

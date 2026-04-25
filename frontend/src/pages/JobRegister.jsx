@@ -1,6 +1,7 @@
 ﻿import { useState, useMemo } from 'react'
 import './JobRegister.css'
 import { jobsAPI } from '../services/api'
+import logo from '../assets/logo.png'
 
 function JobRegister({ ctx, setPage }) {
   const { jobs, setJobs, workers } = ctx
@@ -146,7 +147,10 @@ function JobRegister({ ctx, setPage }) {
   return (
     <div className="job-register">
       <div className="register-title">
-        <span>Job Register - Tailor Master 8.0 ( www.gblabs.net ) - The Ultimate Solution for Tailoring Shop</span>
+        <div className="title-content">
+          <img src={logo} alt="BenGift Logo" className="title-logo" />
+          <span>Job Register - BenGift Clothing v1.0 - Quality Tailoring Solutions</span>
+        </div>
         <button className="register-close-btn" onClick={() => setPage('dashboard')} title="Close">✕</button>
       </div>
       

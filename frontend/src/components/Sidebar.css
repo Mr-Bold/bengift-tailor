@@ -24,12 +24,22 @@
   margin-bottom: 1rem;
 }
 
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
 .logo-image {
   width: 100px;
   height: auto;
   max-height: 100px;
   object-fit: contain;
   border-radius: 8px;
+  animation: bounce 2s infinite ease-in-out;
 }
 
 .sidebar-slogan {

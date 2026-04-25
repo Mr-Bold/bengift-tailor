@@ -84,7 +84,7 @@ function Sidebar({ currentPage, setCurrentPage, shopInfo }) {
               <div className="user-avatar">{currentUser.fullName?.charAt(0) || 'U'}</div>
               <div className="user-details">
                 <div className="user-name">{currentUser.fullName}</div>
-                <div className="user-role">{currentUser.role}</div>
+                <div className="user-role">{shopInfo?.name || 'BenGift Clothing'}</div>
               </div>
             </div>
           )}

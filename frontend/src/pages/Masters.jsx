@@ -22,6 +22,10 @@ function Masters({ ctx }) {
   const ClientsMaster = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [showAddForm, setShowAddForm] = useState(false)
+    const [selectedClient, setSelectedClient] = useState(null)
+    const [showClientDetails, setShowClientDetails] = useState(false)
+    const [editMode, setEditMode] = useState(false)
+    const [editedClient, setEditedClient] = useState(null)
     const [newClient, setNewClient] = useState({ 
       name: '', 
       address: '', 
@@ -30,6 +34,24 @@ function Masters({ ctx }) {
       dob: '', 
       phone: '', 
       email: '' 
+    })
+    const [clientMeasurements, setClientMeasurements] = useState({
+      chest: '',
+      waist: '',
+      hip: '',
+      shoulder: '',
+      armLength: '',
+      neckSize: '',
+      sleeveLength: '',
+      inseam: '',
+      length: '',
+      backLength: '',
+      frontLength: '',
+      armhole: ''
+    })
+    const [clientImages, setClientImages] = useState({
+      image1: null,
+      image2: null
     })
 
     const filteredCustomers = customers.filter(c =>
@@ -92,6 +114,53 @@ function Masters({ ctx }) {
       }
     }
 
+    const handleViewClientDetails = (client) => {
+      setSelectedClient(client)
+      setEditedClient({...client})
+      setShowClientDetails(true)
+      setEditMode(false)
+      // Load client measurements and images from localStorage
+      const storedMeasurements = localStorage.getItem(`client_measurements_${client.id || client._id}`)
+      const storedImages = localStorage.getItem(`client_images_${client.id || client._id}`)
+      if (storedMeasurements) setClientMeasurements(JSON.parse(storedMeasurements))
+      if (storedImages) setClientImages(JSON.parse(storedImages))
+    }
+
+    const handleSaveClientDetails = async () => {
+      try {
+        const clientId = selectedClient.id || selectedClient._id
+        if (editedClient._id) {
+          await customersAPI.update(editedClient._id, editedClient)
+        }
+        const updatedCustomers = customers.map(c => 
+          (c.id === clientId || c._id === clientId) ? editedClient : c
+        )
+        setCustomers(updatedCustomers)
+        localStorage.setItem(`client_measurements_${clientId}`, JSON.stringify(clientMeasurements))
+        localStorage.setItem(`client_images_${clientId}`, JSON.stringify(clientImages))
+        showToast.success('Client details updated successfully!')
+        setShowClientDetails(false)
+        setEditMode(false)
+      } catch (error) {
+        console.error('Error updating client:', error)
+        showToast.error('Error updating client')
+      }
+    }
+
+    const handleImageUpload = (imageNum, file) => {
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          setClientImages({...clientImages, [`image${imageNum}`]: e.target.result})
+        }
+        reader.readAsDataURL(file)
+      }
+    }
+
+    const handleClearImage = (imageNum) => {
+      setClientImages({...clientImages, [`image${imageNum}`]: null})
+    }
+
     return (
       <div className="masters-content">
         <div className="clients-title-bar">Clients</div>
@@ -123,12 +192,20 @@ function Masters({ ctx }) {
                     {client.city && <p>{client.city}</p>}
                     {client.dob && <p>DOB: {client.dob}</p>}
                   </div>
-                  <button 
-                    onClick={() => handleDeleteClient(client.id || client._id)}
-                    className="btn-delete-client"
-                  >
-                    Delete
-                  </button>
+                  <div className="client-card-buttons">
+                    <button 
+                      onClick={() => handleViewClientDetails(client)}
+                      className="btn-view-details"
+                    >
+                      View Details
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteClient(client.id || client._id)}
+                      className="btn-delete-client"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -210,6 +287,170 @@ function Masters({ ctx }) {
                 <button onClick={() => setNewClient({ name: '', address: '', city: '', state: '', dob: '', phone: '', email: '' })} className="btn-delete">Delete</button>
                 <button onClick={handleAddClient} className="btn-save">Save</button>
                 <button onClick={() => setShowAddForm(false)} className="btn-cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showClientDetails && selectedClient && (
+          <div className="client-details-overlay">
+            <div className="client-details-modal">
+              <div className="client-details-header">
+                <h2>{editMode ? 'Edit Client Details' : 'Client Details'}</h2>
+                <button className="btn-close-modal" onClick={() => setShowClientDetails(false)}>×</button>
+              </div>
+
+              <div className="client-details-content">
+                <div className="client-details-left">
+                  <div className="client-basic-info">
+                    <h3>Basic Information</h3>
+                    {editMode ? (
+                      <>
+                        <div className="form-group">
+                          <label>Name:</label>
+                          <input 
+                            type="text"
+                            value={editedClient.name}
+                            onChange={(e) => setEditedClient({...editedClient, name: e.target.value})}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Phone:</label>
+                          <input 
+                            type="tel"
+                            value={editedClient.phone}
+                            onChange={(e) => setEditedClient({...editedClient, phone: e.target.value})}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Email:</label>
+                          <input 
+                            type="email"
+                            value={editedClient.email}
+                            onChange={(e) => setEditedClient({...editedClient, email: e.target.value})}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Address:</label>
+                          <input 
+                            type="text"
+                            value={editedClient.address}
+                            onChange={(e) => setEditedClient({...editedClient, address: e.target.value})}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>City:</label>
+                          <input 
+                            type="text"
+                            value={editedClient.city}
+                            onChange={(e) => setEditedClient({...editedClient, city: e.target.value})}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>State:</label>
+                          <input 
+                            type="text"
+                            value={editedClient.state}
+                            onChange={(e) => setEditedClient({...editedClient, state: e.target.value})}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>DOB:</label>
+                          <input 
+                            type="date"
+                            value={editedClient.dob || editedClient.birthday || ''}
+                            onChange={(e) => setEditedClient({...editedClient, dob: e.target.value, birthday: e.target.value})}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p><strong>Name:</strong> {selectedClient.name}</p>
+                        <p><strong>Phone:</strong> {selectedClient.phone}</p>
+                        <p><strong>Email:</strong> {selectedClient.email || '—'}</p>
+                        <p><strong>Address:</strong> {selectedClient.address || '—'}</p>
+                        <p><strong>City:</strong> {selectedClient.city || '—'}</p>
+                        <p><strong>State:</strong> {selectedClient.state || '—'}</p>
+                        <p><strong>DOB:</strong> {selectedClient.dob || selectedClient.birthday || '—'}</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="client-details-right">
+                  <div className="client-measurements">
+                    <h3>Measurements</h3>
+                    <div className="measurements-grid">
+                      {Object.keys(clientMeasurements).map(key => (
+                        <div key={key} className="measurement-item">
+                          <label>{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
+                          <input 
+                            type="text"
+                            value={clientMeasurements[key]}
+                            onChange={(e) => setClientMeasurements({...clientMeasurements, [key]: e.target.value})}
+                            disabled={!editMode}
+                            className={editMode ? '' : 'disabled'}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="client-images">
+                    <h3>Images</h3>
+                    <div className="images-container">
+                      {[1, 2].map(num => (
+                        <div key={num} className="image-box">
+                          <label>Image {num}</label>
+                          <div className="image-preview">
+                            {clientImages[`image${num}`] ? (
+                              <img src={clientImages[`image${num}`]} alt={`Image ${num}`} />
+                            ) : (
+                              <div className="no-image">No Image</div>
+                            )}
+                          </div>
+                          {editMode && (
+                            <div className="image-buttons">
+                              <button 
+                                onClick={() => document.getElementById(`client-image-${num}`).click()}
+                                className="btn-upload"
+                              >
+                                Upload
+                              </button>
+                              <button 
+                                onClick={() => handleClearImage(num)}
+                                className="btn-clear"
+                              >
+                                Clear
+                              </button>
+                              <input 
+                                id={`client-image-${num}`}
+                                type="file"
+                                accept="image/*"
+                                style={{display: 'none'}}
+                                onChange={(e) => handleImageUpload(num, e.target.files[0])}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="client-details-footer">
+                {editMode ? (
+                  <>
+                    <button onClick={() => setEditMode(false)} className="btn-cancel">Cancel</button>
+                    <button onClick={handleSaveClientDetails} className="btn-save">Save Changes</button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => setShowClientDetails(false)} className="btn-cancel">Close</button>
+                    <button onClick={() => setEditMode(true)} className="btn-edit">Edit</button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -411,270 +652,190 @@ function Masters({ ctx }) {
   }
 
   // Items Master
-  // Items Master
-    const ItemsMaster = () => {
-      const [searchTerm, setSearchTerm] = useState('')
-      const [showAddForm, setShowAddForm] = useState(false)
-      const [itemType, setItemType] = useState('fabric')
-      const [newItem, setNewItem] = useState({
-        name: '',
-        measurementFields: '',
-        fees: 0,
-        workerFees: 0,
-        productionCapacity: 0,
-        pendingOrders: 0
-      })
+  const ItemsMaster = () => {
+    const [searchTerm, setSearchTerm] = useState('')
+    const [showAddForm, setShowAddForm] = useState(false)
+    const [newItemName, setNewItemName] = useState('')
+    const [editingItem, setEditingItem] = useState(null)
+    const [editedName, setEditedName] = useState('')
 
-      const filteredGarments = garmentTypes.filter(g =>
-        g.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    // Combine all items into one list
+    const allItems = [...garmentTypes, ...fabrics.map(f => f.name)]
+    const filteredItems = allItems.filter(item =>
+      item.toLowerCase().includes(searchTerm.toLowerCase())
+    )
 
-      const filteredFabrics = fabrics.filter(f =>
-        f.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    const handleAddItem = () => {
+      if (newItemName.trim()) {
+        // Add to garmentTypes (simple items list)
+        setGarmentTypes([...garmentTypes, newItemName.trim()])
+        setNewItemName('')
+        setShowAddForm(false)
+        showToast.success('Item added successfully!')
+      }
+    }
 
-      const handleAddItem = async () => {
-        if (newItem.name.trim()) {
-          if (itemType === 'garment') {
-            setGarmentTypes([...garmentTypes, newItem.name.trim()])
-            showToast.success('Garment type added successfully!')
-          } else {
+    const handleEditClick = (itemName) => {
+      setEditingItem(itemName)
+      setEditedName(itemName)
+    }
+
+    const handleUpdateItem = async () => {
+      if (editedName.trim() && editedName !== editingItem) {
+        const oldName = editingItem
+        const newName = editedName.trim()
+
+        // Check if it's in garmentTypes
+        if (garmentTypes.includes(oldName)) {
+          const updatedGarments = garmentTypes.map(g => g === oldName ? newName : g)
+          setGarmentTypes(updatedGarments)
+          showToast.success('Item updated successfully!')
+        } else {
+          // Check if it's in fabrics
+          const fabric = fabrics.find(f => f.name === oldName)
+          if (fabric) {
             try {
-              const fabric = {
-                name: newItem.name.trim(),
-                measurementFields: newItem.measurementFields,
-                fees: parseFloat(newItem.fees) || 0,
-                workerFees: parseFloat(newItem.workerFees) || 0,
-                productionCapacity: parseInt(newItem.productionCapacity) || 0
+              const updatedFabric = { ...fabric, name: newName }
+              if (fabric._id) {
+                await fabricsAPI.update(fabric._id, updatedFabric)
               }
-              const savedFabric = await fabricsAPI.create(fabric)
-              const fabricData = savedFabric.data || savedFabric // Handle both formats
-              setFabrics([...fabrics, fabricData])
-              showToast.success('Fabric added successfully!')
+              const updatedFabrics = fabrics.map(f => 
+                (f.id || f._id) === (fabric.id || fabric._id) ? updatedFabric : f
+              )
+              setFabrics(updatedFabrics)
+              showToast.success('Item updated successfully!')
             } catch (error) {
-              console.error('Error adding fabric:', error)
-              showToast.error('Error adding fabric. Saved to localStorage as backup.')
-              // Fallback
-              setFabrics([...fabrics, { 
-                id: uid(), 
-                name: newItem.name.trim(),
-                measurementFields: newItem.measurementFields,
-                fees: newItem.fees,
-                workerFees: newItem.workerFees,
-                productionCapacity: newItem.productionCapacity,
-                pendingOrders: newItem.pendingOrders
-              }])
+              console.error('Error updating fabric:', error)
+              // Still update locally
+              const updatedFabrics = fabrics.map(f => 
+                (f.id || f._id) === (fabric.id || fabric._id) ? { ...f, name: newName } : f
+              )
+              setFabrics(updatedFabrics)
+              showToast.success('Item updated locally!')
             }
           }
-          setNewItem({
-            name: '',
-            measurementFields: '',
-            fees: 0,
-            workerFees: 0,
-            productionCapacity: 0,
-            pendingOrders: 0
-          })
-          setShowAddForm(false)
         }
+        setEditingItem(null)
+        setEditedName('')
+      } else if (editedName === editingItem) {
+        // No change, just cancel edit
+        setEditingItem(null)
+        setEditedName('')
       }
+    }
 
-      const handleDeleteGarment = (index) => {
-        if (window.confirm('Delete this garment type?')) {
-          setGarmentTypes(garmentTypes.filter((_, i) => i !== index))
-        }
-      }
+    const handleCancelEdit = () => {
+      setEditingItem(null)
+      setEditedName('')
+    }
 
-      const handleDeleteFabric = async (id) => {
-        if (window.confirm('Delete this fabric?')) {
-          try {
-            const fabric = fabrics.find(f => f.id === id || f._id === id)
-            if (fabric && fabric._id) {
-              await fabricsAPI.delete(fabric._id)
-            }
-            setFabrics(fabrics.filter(f => f.id !== id && f._id !== id))
-          } catch (error) {
-            console.error('Error deleting fabric:', error)
-            setFabrics(fabrics.filter(f => f.id !== id && f._id !== id))
+    const handleDeleteItem = (itemName) => {
+      if (window.confirm('Delete this item?')) {
+        // Check if it's in garmentTypes
+        if (garmentTypes.includes(itemName)) {
+          setGarmentTypes(garmentTypes.filter(g => g !== itemName))
+        } else {
+          // Check if it's in fabrics
+          const fabric = fabrics.find(f => f.name === itemName)
+          if (fabric) {
+            const fabricId = fabric.id || fabric._id
+            fabricsAPI.delete(fabric._id).catch(err => console.error('Error deleting fabric:', err))
+            setFabrics(fabrics.filter(f => (f.id || f._id) !== fabricId))
           }
         }
       }
+    }
 
-      const allItems = searchTerm ? [...filteredGarments, ...filteredFabrics.map(f => f.name)] : []
-      const hasResults = searchTerm && (filteredGarments.length > 0 || filteredFabrics.length > 0)
+    return (
+      <div className="masters-content">
+        <div className="items-title-bar">Items</div>
 
-      return (
-        <div className="masters-content">
-          <div className="items-title-bar">Items</div>
+        <div className="items-search-section">
+          <label>Search</label>
+          <input 
+            type="text" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search items..."
+          />
+        </div>
 
-          <div className="items-search-section">
-            <label>Search</label>
-            <input 
-              type="text" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search items..."
-            />
-          </div>
-
-          <div className="items-list-container">
-            {searchTerm && !hasResults ? (
-              <div className="no-items">No items found matching your search</div>
-            ) : !searchTerm ? (
-              <div className="items-display">
-                <div className="items-section">
-                  <h4>Garment Types ({garmentTypes.length})</h4>
-                  <div className="items-list">
-                    {garmentTypes.map((g, i) => (
-                      <div key={i} className="item-card">
-                        <span>{g}</span>
-                        <button 
-                          onClick={() => handleDeleteGarment(i)}
-                          className="btn-delete-item"
-                        >
-                          �
-                        </button>
+        <div className="items-list-container">
+          {filteredItems.length === 0 ? (
+            <div className="no-items">
+              {searchTerm ? 'No items found matching your search' : 'No items added yet'}
+            </div>
+          ) : (
+            <div className="items-list">
+              {filteredItems.map((item, idx) => (
+                <div key={idx} className="item-card">
+                  {editingItem === item ? (
+                    <div className="item-edit-mode">
+                      <input 
+                        type="text"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleUpdateItem()
+                          if (e.key === 'Escape') handleCancelEdit()
+                        }}
+                        autoFocus
+                        className="item-edit-input"
+                      />
+                      <div className="item-edit-buttons">
+                        <button onClick={handleUpdateItem} className="btn-update-item">✓</button>
+                        <button onClick={handleCancelEdit} className="btn-cancel-edit">✕</button>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="items-section">
-                  <h4>Fabrics ({fabrics.length})</h4>
-                  <div className="items-list">
-                    {fabrics.map(f => (
-                      <div key={f.id || f._id} className="item-card">
-                        <span>{f.name}</span>
-                        <button 
-                          onClick={() => handleDeleteFabric(f.id || f._id)}
-                          className="btn-delete-item"
-                        >
-                          �
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="search-results">
-                {filteredGarments.length > 0 && (
-                  <div className="results-section">
-                    <h5>Garment Types</h5>
-                    {filteredGarments.map((g, i) => (
-                      <div key={i} className="result-item">{g}</div>
-                    ))}
-                  </div>
-                )}
-                {filteredFabrics.length > 0 && (
-                  <div className="results-section">
-                    <h5>Fabrics</h5>
-                    {filteredFabrics.map(f => (
-                      <div key={f.id || f._id} className="result-item">{f.name}</div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="items-bottom-actions">
-            <button onClick={handleBack} className="btn-back">Back</button>
-            <button onClick={() => setShowAddForm(!showAddForm)} className="btn-add-new">Add New</button>
-          </div>
-
-          {showAddForm && (
-            <div className="add-item-form-overlay">
-              <div className="add-item-form">
-                <h3>Add New Item</h3>
-
-                <div className="form-group">
-                  <label>Item Type :</label>
-                  <select 
-                    value={itemType}
-                    onChange={(e) => setItemType(e.target.value)}
-                    className="item-type-select"
-                  >
-                    <option value="garment">Garment Type (No Fees)</option>
-                    <option value="fabric">Fabric/Item with Fees</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Name :</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Shirt, Trouser"
-                    value={newItem.name}
-                    onChange={(e) => setNewItem({...newItem, name: e.target.value})}
-                  />
-                </div>
-
-                {itemType === 'fabric' && (
-                  <>
-                    <div className="form-group">
-                      <label>Item's Measurement Fields</label>
-                      <p className="field-hint">Enter field name line by line, if field has default value, enter field name and =value e.g. Height=100,Double Pocket=Yes</p>
-                      <textarea 
-                        placeholder="Measurement 1&#10;Measurement 2&#10;Measurement 3=Default Value"
-                        value={newItem.measurementFields}
-                        onChange={(e) => setNewItem({...newItem, measurementFields: e.target.value})}
-                        rows="6"
-                      />
                     </div>
-
-                    <div className="form-group">
-                      <label>Fees :</label>
-                      <input 
-                        type="number" 
-                        placeholder="0.00"
-                        value={newItem.fees}
-                        onChange={(e) => setNewItem({...newItem, fees: parseFloat(e.target.value) || 0})}
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Worker's Fees :</label>
-                      <input 
-                        type="number" 
-                        placeholder="0.00"
-                        value={newItem.workerFees}
-                        onChange={(e) => setNewItem({...newItem, workerFees: parseFloat(e.target.value) || 0})}
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Per day production capacity :</label>
-                      <input 
-                        type="number" 
-                        placeholder="0.00"
-                        value={newItem.productionCapacity}
-                        onChange={(e) => setNewItem({...newItem, productionCapacity: parseFloat(e.target.value) || 0})}
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Pending orders :</label>
-                      <input 
-                        type="number" 
-                        placeholder="0.00"
-                        value={newItem.pendingOrders}
-                        onChange={(e) => setNewItem({...newItem, pendingOrders: parseFloat(e.target.value) || 0})}
-                      />
-                    </div>
-                  </>
-                )}
-
-                <div className="form-buttons">
-                  <button onClick={() => setNewItem({ name: '', measurementFields: '', fees: 0, workerFees: 0, productionCapacity: 0, pendingOrders: 0 })} className="btn-delete">Delete</button>
-                  <button onClick={handleAddItem} className="btn-save">Save</button>
-                  <button onClick={() => setShowAddForm(false)} className="btn-cancel">Cancel</button>
+                  ) : (
+                    <>
+                      <span onClick={() => handleEditClick(item)} className="item-name-editable">{item}</span>
+                      <button 
+                        onClick={() => handleDeleteItem(item)}
+                        className="btn-delete-item"
+                      >
+                        ×
+                      </button>
+                    </>
+                  )}
                 </div>
-              </div>
+              ))}
             </div>
           )}
         </div>
-      )
-    }
+
+        <div className="items-bottom-actions">
+          <button onClick={handleBack} className="btn-back">Back</button>
+          <button onClick={() => setShowAddForm(!showAddForm)} className="btn-add-new">Add New</button>
+        </div>
+
+        {showAddForm && (
+          <div className="add-item-form-overlay">
+            <div className="add-item-form">
+              <h3>Add New Item</h3>
+
+              <div className="form-group">
+                <label>Item Name :</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Shirt, Trouser, Fabric"
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
+                />
+              </div>
+
+              <div className="form-buttons">
+                <button onClick={() => setNewItemName('')} className="btn-delete">Clear</button>
+                <button onClick={handleAddItem} className="btn-save">Save</button>
+                <button onClick={() => setShowAddForm(false)} className="btn-cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   // Accounts Master
   const AccountsMaster = () => {
@@ -738,7 +899,7 @@ function Masters({ ctx }) {
                     onClick={() => handleDeleteAccount(accounts.indexOf(account))}
                     className="btn-delete-account"
                   >
-                    �
+                    �
                   </button>
                 </div>
               ))}
