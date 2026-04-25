@@ -1,8 +1,9 @@
 ﻿import { useState } from 'react'
 import './Reports.css'
+import logo from '/images/LOGO WINE.png'
 
 function Reports({ ctx, setPage }) {
-  const { jobs, customers, workers } = ctx
+  const { jobs, customers, workers, shop } = ctx
   const [showMenu, setShowMenu] = useState(true)
   const [selectedReport, setSelectedReport] = useState(null)
 
@@ -853,9 +854,9 @@ function Reports({ ctx, setPage }) {
           <div className="reports-menu" onClick={(e) => e.stopPropagation()}>
             <div className="menu-header">
               <div className="menu-logo">
-                <span className="logo-icon">M</span>
+                <img src={logo} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
-              <h2>Tailor Master</h2>
+              <h2>{shop?.name || 'BenGift Clothing'}</h2>
               <button className="btn-close" onClick={() => handleCloseReports()}>✕</button>
             </div>
             <div className="menu-items">
